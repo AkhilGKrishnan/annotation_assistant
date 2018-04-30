@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>MTAAC annotation dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script>
+	$(document).ready(function() {
+		$( "#new_text" ).click(function() {
+			Dashboard.select_new_text();
+		});
+	});
+  </script>
+  <style>
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+<h3>Hi, {{ username }}!</h3>
+<h4>You need a new text to annotate.<h4>
+<button type="button" class="btn btn-primary" id="new_text">Get new text</button>
+</div>
+</body>
+</html>
