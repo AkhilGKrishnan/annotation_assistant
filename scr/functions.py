@@ -13,9 +13,6 @@ from github.GithubException import GithubException
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-## TO DO:
-##  Uncomment #self.convert_to_conll_U(ID) when issue MPAT issue is solved
-
 #---/ Common functions /-------------------------------------------------------
 #
 class common_functions:
@@ -257,14 +254,14 @@ class annotation_functions(common_functions):
     '''
     self.actualize()
     ID = self.progress_dict[self.user]['annotating']
-    self.progress_data_ready_update()
-    #self.convert_to_conll_U(ID)
+    self.convert_to_conll_U(ID)
     target = os.path.join(self.PROCESSED, '%s.conll' %ID)
     dest = os.path.join(self.TO_DICT, '%s.conll' %ID)
     shutil.move(target, dest)
     self.update_github(ID)
+    self.progress_data_ready_update()
 
-  def convert_to_conll_U(self):
+  def convert_to_conll_U(self, ID):
     '''
     Run mpat with -f switch to format the conll files for
     next Conll-U convertor. Then replace the original
