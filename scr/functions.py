@@ -178,19 +178,19 @@ class annotation_functions(common_functions):
     if self.user not in self.progress_dict.keys():
      self.progress_dict[self.user] = {'annotating': '', 'done': []}
     self.progress_dict[self.user]['annotating'] = ID
-    self.dump_progress_data()
+    self.update_progress_data()
 
   def progress_data_ready_update(self):
     '''
-    Add new ID to `self.progress_dict` and `self.progress_lst`.
+    Move annotated ID to "done" list in `self.progress_dict`.
     Then dump `self.progress_lst` to JSON.
     '''
     ID = self.progress_dict[self.user]['annotating']
     self.progress_dict[self.user]['done'].append(ID)
     self.progress_dict[self.user]['annotating'] = ''
-    self.dump_progress_data()
+    self.update_progress_data()
 
-  def dump_progress_data(self):
+  def update_progress_data(self):
     '''
     Dump `self.progress_lst` to JSON.
     '''
@@ -218,6 +218,8 @@ class annotation_functions(common_functions):
                     dest)
     self.preannotate_and_replace(dest)
     self.progress_data_annotating_update(ID)
+    git_message = 'Select %s.conll for annotation by %s' %(ID, self.user)
+    self.update_github(git_message)
     return True
 
   def select_random_to_annotate(self):
@@ -258,8 +260,9 @@ class annotation_functions(common_functions):
     target = os.path.join(self.PROCESSED, '%s.conll' %ID)
     dest = os.path.join(self.TO_DICT, '%s.conll' %ID)
     shutil.move(target, dest)
-    self.update_github(ID)
     self.progress_data_ready_update()
+    git_message = 'Add annotated %s.conll by %s' %(ID, self.user)
+    self.update_github(git_message)
 
   def convert_to_conll_U(self, ID):
     '''
@@ -273,11 +276,10 @@ class annotation_functions(common_functions):
     shutil.move(output_path, file_path)
     shutil.rmtree(os.path.join(self.PROCESSED, 'output'))
 
-  def update_github(self, ID):
+  def update_github(self, message):
     '''
     Push repo to GitHub.
     '''
-    message = 'Add annotated %s.conll by %s' %(ID, self.user)
     repo_data = 'https://%s:%s@%s' %(self.user,
                                      self.password,
                                      self.GIT_ANNOTATED.split('//')[1])

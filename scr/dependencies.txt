@@ -1,4 +1,5 @@
+../dependencies/PyQt4-4.11.4-cp36-cp36m-win_amd64.whl
+../dependencies/PySide-1.2.4-cp36-cp36m-win_amd64.whl
 jinja2
-dependencies/PySide-1.2.4-cp36-cp36m-win_amd64.whl
 htmlPy
 PyGithub
