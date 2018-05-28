@@ -7,11 +7,24 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/eel.js"></script>
   <script>
+	eel.expose(reload);
+	function reload() {
+		window.location.reload(true);
+	};
+	eel.expose(login_error);
+	function login_error() {
+		alert("Incorrect Github username or password. Please, try again.");
+		/* $(".form-group").attr("class", "form-group has-error");
+		$('#login_error').attr("style", "");*/
+	};
 	$(document).ready(function() {
-		/*Dashboard.plug_annotation_backend();*/
-		$( "#new_text" ).click(function() {
-		  Dashboard.get_new_text();
+		$( "#login" ).click(function() {
+			console.log($("#github_username"), $("#github_password"));
+			var form_dict = {"username": $("#github_username")[0].value, "password": $("#github_password")[0].value}
+			var form_dict_JSON = JSON.stringify(form_dict);
+			eel.github_login(form_dict_JSON);
 		});
 	});
   </script>
@@ -21,19 +34,17 @@
 <body>
 <div class="container-fluid">
 <h1>Github login data</h1>
-<form action="Dashboard.github_login" id="form" data-bind="true">
+<form id="form" data-bind="true">
 	<div class="form-group">
 		<label for="github_username">Username:</label>
-		<input type="text" id="github_username" name="username" value="{{ username }}">
+		<input type="text" id="github_username" autocomplete='name' name="username" required>
 	</div>
 	<div class="form-group">
 		<label for="github_password">Password:</label>
-		<input type="password" id="github_password" name="password" value="{{ password }}">
+		<input type="password" id="github_password" autocomplete="password" name="password" required>
+		<span class="help-block" style="display:none" id="login_error">Incorrect Github username or password. Please, try again.</span>
 	</div>
-	<div class="checkbox">
-		<label><input type="checkbox" id="remember" name="remember" {{ remember }}>Remember me</label>
-	</div>
-    <button type="submit" class="btn btn-default">Login</button>
+    <button id="login" type="submit" class="btn btn-default">Login</button>
 </form>
 </div>
 </div>

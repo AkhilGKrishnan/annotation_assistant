@@ -7,16 +7,21 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/eel.js"></script>
   <script>
+	eel.expose(reload);
+	function reload() {
+		window.location.reload(true);
+	};
 	$(document).ready(function() {
 		$( "#dir" ).click(function() {
-			Dashboard.open_dir();
+			eel.open_dir();
 		});
 		$( "#CDLI_page" ).click(function() {
-			Dashboard.open_page();
+			eel.open_page();
 		});
 		$( "#push" ).click(function() {
-			Dashboard.convert_and_push();
+			eel.convert_and_push();
 		});
 	});
   </script>
