@@ -8,10 +8,8 @@ MPAT, its dictionary, and annotated data are updated on start and before each op
 ## Requires:
 - Git
 - Python 3.6
-- PyQt4
-- PySide-1.2.4
 - Jinja2
-- htmlPy
+- Eel
 - PyGithub
 
 ## Installation (Windows):
