@@ -12,15 +12,15 @@ MPAT, its dictionary, and annotated data are updated on start and before each op
 - Eel
 - PyGithub
 
-## Installation (Windows):
-1. Install [Git](https://www.atlassian.com/git/tutorials/install-git) ([Windows](https://github.com/git-for-windows/git/releases/download/v2.17.0.windows.1/Git-2.17.0-64-bit.exe)).
-2. Install [Python 3.6](https://www.python.org/downloads/release/python-365/) ([Windows](https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe)).
-3. In Command Prompt / Powershell: Go to a desired location (`cd <PATH>`) and clone this repo with `git clone https://github.com/cdli-gh/annotation_assistant.git`
-4. In Command Prompt / Powershell (continue): Go to the `scr` directory in the cloned repo (`cd scr`) and install remaining dependecies with `pip install -r dependencies.txt`.
+## Installation:
+1. Install [Git](https://www.atlassian.com/git/tutorials/install-git) ([Windows](https://github.com/git-for-windows/git/releases/download/v2.17.0.windows.1/Git-2.17.0-64-bit.exe), [Mac](https://sourceforge.net/projects/git-osx-installer/files/), [Linux](https://www.atlassian.com/git/tutorials/install-git#linux)).
+2. Install [Python 3.6](https://www.python.org/downloads/release/python-365/) ([Windows](https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe), [Mac](https://www.python.org/downloads/mac-osx/), [Linux](https://askubuntu.com/questions/865554/how-do-i-install-python-3-6-using-apt-get?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa)).
+3. In Command Prompt / Powershell (Windows) / Bash terminal (Mac, Linux): Go to a desired location (`cd <PATH>`) and clone this repo with `git clone https://github.com/cdli-gh/annotation_assistant.git`
+4. In Command Prompt / Powershell (Windows) / Bash terminal (Mac, Linux) (continue): Go to the `scr` directory in the cloned repo (`cd scr`) and install remaining dependecies with `pip install -r dependencies.txt`.
 
-## Running (Windows):
-1. Windows explorer: Simply double click on `main.py` in `annotation_assistant/scr/`.
-2. Alternatively, in Command Prompt / Powershell:\
+## Running:
+1. (Windows explorer:) Double click on `main.py` in `annotation_assistant/scr/`.
+2. Alternatively, in Command Prompt / Powershell (Windows) / Bash terminal (Mac, Linux):\
 `python main.py` (when in `scr` directory) OR `python <PATH TO REPO>/annotation_assistant/scr/main.py` (any).
 3. Alternatively, open `main.py` with Python IDLE, then run it (F5 or in menu).
 
