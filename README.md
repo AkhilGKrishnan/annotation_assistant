@@ -39,7 +39,7 @@ MPAT, its dictionary, and annotated data are updated on start and before each op
 5. Push changes to repo.
 
 ### Convert and upload text:
-1. Run MPAT with `-f` switch to format the annotated `.conll` file for next Conll-U convertor.
+1. Run MPAT with `-f` switch to correct the file format, removing extra columns adding underscores in empty cells.
 2. Move `.conll` file to ready files directory (`to_dict`).
 3. Update `progress.json`.
 4. Push changes to repo.
