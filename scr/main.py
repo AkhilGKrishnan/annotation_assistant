@@ -352,7 +352,6 @@ class Dashboard(common_functions):
   def select_new_text(self):
     self.af.update_mpat_dict()
     self.af.select_new_text()
-    time.sleep(10)
     self.annotation_view()
 
   def convert_and_push(self):
