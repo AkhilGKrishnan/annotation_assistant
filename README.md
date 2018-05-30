@@ -15,7 +15,7 @@ MPAT, its dictionary, and annotated data are updated on start and before each op
 ## Installation (Windows):
 1. Install [Git](https://www.atlassian.com/git/tutorials/install-git) ([Windows](https://github.com/git-for-windows/git/releases/download/v2.17.0.windows.1/Git-2.17.0-64-bit.exe)).
 2. Install [Python 3.6](https://www.python.org/downloads/release/python-365/) ([Windows](https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe)).
-3. In Command Prompt / Powershell: Go to a desired location (`cd <PATH>`) and clone this repo with `git clone git+https://github.com/cdli-gh/annotation_assistant.git`
+3. In Command Prompt / Powershell: Go to a desired location (`cd <PATH>`) and clone this repo with `git clone https://github.com/cdli-gh/annotation_assistant.git`
 4. In Command Prompt / Powershell (continue): Go to the `scr` directory in the cloned repo (`cd scr`) and install remaining dependecies with `pip install -r dependencies.txt`.
 
 ## Running (Windows):
