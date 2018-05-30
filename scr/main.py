@@ -115,6 +115,8 @@ class annotation_functions(common_functions):
     Actualize MPAT and annotated data.
     '''
     self.install_or_upgrade_mpat()
+    if not os.path.exists(self.ANNOTATED_ROOT):
+      os.makedirs(self.ANNOTATED_ROOT)
     if not os.path.exists(os.path.join(self.ANNOTATED_ROOT,
                                        self.ANNOTATED_REPO_NAME)):
       self.clone_annotated()
