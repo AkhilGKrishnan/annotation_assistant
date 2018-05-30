@@ -122,7 +122,6 @@ class annotation_functions(common_functions):
       self.clone_annotated()
     else:
       self.update_annotated()
-    self.update_mpat_dict()
     self.load_progress_data()
 
   def install_or_upgrade_mpat(self):
@@ -351,6 +350,7 @@ class Dashboard(common_functions):
                                    self.login_data["password"])
 
   def select_new_text(self):
+    self.af.update_mpat_dict()
     self.af.select_new_text()
     time.sleep(10)
     self.annotation_view()
