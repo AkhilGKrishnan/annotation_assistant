@@ -25,9 +25,7 @@ MPAT, its dictionary, and annotated data are updated on start and before each op
 3. Alternatively, open `main.py` with Python IDLE, then run it (F5 or in menu).
 
 ## Warnings and notes:
-- The window might freeze when running scripts in the background. Just wait for them to finish.
 - Logs for each session are stored in `annotation_assistant/scr/console.log`.
-- Your Github credentials are stored locally if you choose to save them.
 
 ## Operations, short summary:
 
