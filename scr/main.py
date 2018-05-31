@@ -83,7 +83,13 @@ class subprocesses(common_functions):
         output += line.rstrip().decode('utf-8')+'\n'
     except ValueError:
       print('subprocess stopped.')
-    return output
+    return self.escape_password(output)
+
+  def escape_password(self, output):
+    if 'git push' not in output:
+      return output
+    return output.replace(output[output.rfind(":")+1:output.find("@")],
+                          "********")
 
 sp = subprocesses()
 
@@ -249,18 +255,17 @@ class annotation_functions(common_functions):
                 path)
     shutil.rmtree(os.path.join(root_path, 'output'))
 
-  def convert_and_push(self):
+  def correct_and_push(self):
     '''
     Push text workflow:
-    1. Run mpat with -f switch to format the conll files for
-      next Conll-U convertor
+    1. Run mpat with -f switch to correct the format.
     2. Update `self.progress_dict`.
     3. Move .conll file from `self.PROCESSED` to `self.TO_DICT`
     4. Push changes to repo.
     '''
     self.actualize()
     ID = self.progress_dict[self.user]['annotating']
-    self.convert_to_conll_U(ID)
+    self.correct_format(ID)
     target = os.path.join(self.PROCESSED, '%s.conll' %ID)
     dest = os.path.join(self.TO_DICT, '%s.conll' %ID)
     shutil.move(target, dest)
@@ -268,11 +273,11 @@ class annotation_functions(common_functions):
     git_message = 'Add annotated %s.conll by %s' %(ID, self.user)
     self.update_github(git_message)
 
-  def convert_to_conll_U(self, ID):
+  def correct_format(self, ID):
     '''
-    Run mpat with -f switch to format the conll files for
-    next Conll-U convertor. Then replace the original
-    with it.
+    Run mpat with -f switch to correct the file format:
+    remove extra columns and add underscores in empty cells.
+    Then replace the original with it.
     '''
     file_path = os.path.join(self.PROCESSED, '%s.conll' %ID)
     output_path = os.path.join(self.PROCESSED, 'output', '%s.conll' %ID)
@@ -355,8 +360,8 @@ class Dashboard(common_functions):
     self.af.select_new_text()
     self.annotation_view()
 
-  def convert_and_push(self):
-    self.af.convert_and_push()
+  def correct_and_push(self):
+    self.af.correct_and_push()
     self.new_text_view()
 
   def templates_manager(self, template, args_dict):
@@ -413,9 +418,9 @@ def select_new_text():
   d.select_new_text()
 
 @eel.expose
-def convert_and_push():
+def correct_and_push():
   print('converting and pushing')
-  d.convert_and_push()
+  d.correct_and_push()
 
 @eel.expose
 def open_dir():
