@@ -75,6 +75,7 @@ class subprocesses(common_functions):
     print(trace)
     self.output+=trace+'\n'
     self.dump(self.output, 'console.log')
+    return trace
       
   def trace_console(self, p):
     output = ""
@@ -255,6 +256,14 @@ class annotation_functions(common_functions):
                 path)
     shutil.rmtree(os.path.join(root_path, 'output'))
 
+  def check_for_errors(self):
+    '''
+    Check annotated text for errors with mpat.
+    '''
+    ID = self.progress_dict[self.user]['annotating']
+    file_path = os.path.join(self.PROCESSED, '%s.conll' %ID)
+    return sp.run(['mpat', '-c', '-i', file_path])
+
   def correct_and_push(self):
     '''
     Push text workflow:
@@ -289,15 +298,16 @@ class annotation_functions(common_functions):
     '''
     Push repo to GitHub.
     '''
-    repo_data = 'https://%s:%s@%s' %(self.user,
-                                     self.password,
-                                     self.GIT_ANNOTATED.split('//')[1])
-    # Use ['git', 'checkout', '-b', self.branch] to create branch
-    sp.run(['git', 'checkout', self.branch], cwd=self.ANNOTATED_PATH)
-    sp.run(['git', 'add', '.'], cwd=self.ANNOTATED_PATH)
-    sp.run(['git', 'commit', '-a','-m', message], cwd=self.ANNOTATED_PATH)
-    sp.run(['git', 'push', repo_data, self.branch],
-           cwd=self.ANNOTATED_PATH)
+    pass
+##    repo_data = 'https://%s:%s@%s' %(self.user,
+##                                     self.password,
+##                                     self.GIT_ANNOTATED.split('//')[1])
+##    # Use ['git', 'checkout', '-b', self.branch] to create branch
+##    sp.run(['git', 'checkout', self.branch], cwd=self.ANNOTATED_PATH)
+##    sp.run(['git', 'add', '.'], cwd=self.ANNOTATED_PATH)
+##    sp.run(['git', 'commit', '-a','-m', message], cwd=self.ANNOTATED_PATH)
+##    sp.run(['git', 'push', repo_data, self.branch],
+##           cwd=self.ANNOTATED_PATH)
     
 #---/ Dashboard scripts /------------------------------------------------------
 #
@@ -360,6 +370,18 @@ class Dashboard(common_functions):
     self.af.select_new_text()
     self.annotation_view()
 
+  def check_for_errors(self):
+    errs = self.af.check_for_errors()
+    errs_html_str = ''
+    for err in errs.strip('\n').split('\n\n'):
+      err = err.strip(" ")
+      if len(err)!=0:
+        errs_html_str+='''<li class="list-group-item ''' \
+                        '''list-group-item-danger">%s</li>''' %err
+    if len(errs_html_str)==0:
+      return None
+    return "<ul class='list-group'>%s</ul>" %errs_html_str
+
   def correct_and_push(self):
     self.af.correct_and_push()
     self.new_text_view()
@@ -421,6 +443,15 @@ def select_new_text():
 def correct_and_push():
   print('converting and pushing')
   d.correct_and_push()
+
+@eel.expose
+def check_for_errors():
+  print('checking for errors')
+  errors = d.check_for_errors()
+  if errors==None:
+    eel.errors_feedback("clean")
+  else:
+    eel.errors_feedback(errors)
 
 @eel.expose
 def open_dir():
