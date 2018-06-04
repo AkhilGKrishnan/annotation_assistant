@@ -298,16 +298,15 @@ class annotation_functions(common_functions):
     '''
     Push repo to GitHub.
     '''
-    pass
-##    repo_data = 'https://%s:%s@%s' %(self.user,
-##                                     self.password,
-##                                     self.GIT_ANNOTATED.split('//')[1])
-##    # Use ['git', 'checkout', '-b', self.branch] to create branch
-##    sp.run(['git', 'checkout', self.branch], cwd=self.ANNOTATED_PATH)
-##    sp.run(['git', 'add', '.'], cwd=self.ANNOTATED_PATH)
-##    sp.run(['git', 'commit', '-a','-m', message], cwd=self.ANNOTATED_PATH)
-##    sp.run(['git', 'push', repo_data, self.branch],
-##           cwd=self.ANNOTATED_PATH)
+    repo_data = 'https://%s:%s@%s' %(self.user,
+                                     self.password,
+                                     self.GIT_ANNOTATED.split('//')[1])
+    # Use ['git', 'checkout', '-b', self.branch] to create branch
+    sp.run(['git', 'checkout', self.branch], cwd=self.ANNOTATED_PATH)
+    sp.run(['git', 'add', '.'], cwd=self.ANNOTATED_PATH)
+    sp.run(['git', 'commit', '-a','-m', message], cwd=self.ANNOTATED_PATH)
+    sp.run(['git', 'push', repo_data, self.branch],
+           cwd=self.ANNOTATED_PATH)
     
 #---/ Dashboard scripts /------------------------------------------------------
 #
