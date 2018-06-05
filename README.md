@@ -9,7 +9,7 @@ MPAT, its dictionary, and annotated data are updated on start and before each op
 - Git
 - Python 3.6
 - Jinja2
-- Eel
+- [Eel](https://github.com/ChrisKnott/Eel/) (modified)
 - PyGithub
 
 ## Installation:
