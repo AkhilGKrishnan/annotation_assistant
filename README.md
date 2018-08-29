@@ -7,16 +7,18 @@ MPAT, its dictionary, and annotated data are updated on start and before each op
 
 ## Requires:
 - Git
-- Python 3.6
+- Python 3.6 or higher
+- [Visual C++](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) 2014 or higher
 - Jinja2
 - [Eel](https://github.com/ChrisKnott/Eel/) (modified)
 - PyGithub
 
 ## Installation:
 1. Install [Git](https://www.atlassian.com/git/tutorials/install-git) ([Windows](https://github.com/git-for-windows/git/releases/download/v2.17.0.windows.1/Git-2.17.0-64-bit.exe), [Mac](https://sourceforge.net/projects/git-osx-installer/files/), [Linux](https://www.atlassian.com/git/tutorials/install-git#linux)).
-2. Install [Python 3.6](https://www.python.org/downloads/release/python-365/) ([Windows](https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe), [Mac](https://www.python.org/downloads/mac-osx/), [Linux](https://askubuntu.com/questions/865554/how-do-i-install-python-3-6-using-apt-get?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa)).
-3. In Command Prompt / Powershell (Windows) / Bash terminal (Mac, Linux): Go to a desired location (`cd <PATH>`) and clone this repo with `git clone https://github.com/cdli-gh/annotation_assistant.git`
-4. In Command Prompt / Powershell (Windows) / Bash terminal (Mac, Linux) (continue): Go to the `scr` directory in the cloned repo (`cd scr`) and install remaining dependecies with `pip install -r dependencies.txt`.
+2. On Windows, install [Visual C++](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) 2014 or higher.
+3. Install [Python 3.6](https://www.python.org/downloads/release/python-365/) ([Windows](https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe), [Mac](https://www.python.org/downloads/mac-osx/), [Linux](https://askubuntu.com/questions/865554/how-do-i-install-python-3-6-using-apt-get?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa)).
+4. In Command Prompt / Powershell (Windows) / Bash terminal (Mac, Linux): Go to a desired location (`cd <PATH>`) and clone this repo with `git clone https://github.com/cdli-gh/annotation_assistant.git`
+5. In Command Prompt / Powershell (Windows) / Bash terminal (Mac, Linux) (continue): Go to the `scr` directory in the cloned repo (`cd scr`) and install remaining dependecies with `pip install -r dependencies.txt`.
 
 ## Running:
 1. (Windows explorer:) Double click on `main.py` in `annotation_assistant/scr/`.
