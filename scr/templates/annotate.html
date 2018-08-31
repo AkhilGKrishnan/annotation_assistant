@@ -35,7 +35,7 @@
 		$( "#check_1, #check_2" ).click(function() {
 			errors_feedback();
 		});
-		$( "#push" ).click(function() {
+		$( "#push_1, #push_2" ).click(function() {
 			eel.correct_and_push();
 		});
 	});
@@ -56,12 +56,13 @@
 	<div id='errors_detected' style="display:none">
 		<h4>Your file contains the following errors:</h4>
 		<div id='errors_list'></div>
-		<h4>Correct them and try again</h4>
-		<button type="button" class="btn btn-primary" id="check_2">Check</button>
+		<h4>Please, correct them and try again</h4>
+		<button type="button" class="btn btn-danger" id="push_1">Upload text anyways</button>
+		<button type="button" class="btn btn-primary" id="check_2">Check again</button>
 	</div>
 	<div id="no_errors" style="display:none">
 		<h4>The annotation is free of errors. Click to upload it to the Github repo:</h4>
-		<button type="button" class="btn btn-primary" id="push">Upload text</button>
+		<button type="button" class="btn btn-primary" id="push_1">Upload text</button>
 	</div>
 </div>
 </body>
