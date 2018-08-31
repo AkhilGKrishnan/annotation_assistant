@@ -13,8 +13,8 @@
 	function reload() {
 		window.location.reload(true);
 	};
-	eel.expose(errors_feedback);
-	function errors_feedback(errors) {
+	async function errors_feedback() {
+		let errors = await eel.check_for_errors()();
 		$("#errors_check").attr("style", "display:none");
 		if (errors=="clean"){
 			$("#errors_detected").attr("style", "display:none");
@@ -33,7 +33,7 @@
 			eel.open_page();
 		});
 		$( "#check_1, #check_2" ).click(function() {
-			eel.check_for_errors();
+			errors_feedback();
 		});
 		$( "#push" ).click(function() {
 			eel.correct_and_push();

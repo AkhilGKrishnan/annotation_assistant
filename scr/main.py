@@ -101,7 +101,8 @@ class annotation_functions(common_functions):
   Contains Morphology Pre-annotation Tool workflow functions.
   """
 
-  GIT_MPAT = 'git+https://github.com/cdli-gh/morphology-pre-annotation-tool.git'
+  GIT_MPAT = 'git+https://github.com/cdli-gh/' \
+             'morphology-pre-annotation-tool.git'
   GIT_ANNOTATED = 'https://github.com/cdli-gh/mtaac_gold_corpus.git'
   ANNOTATED_ROOT = os.path.join(BASE_DIR, "data")
   ANNOTATED_REPO_NAME = 'mtaac_gold_corpus'
@@ -112,7 +113,11 @@ class annotation_functions(common_functions):
   progress_json_path = os.path.join(ANNOTATED_PATH, 'morph', 'progress.json')
   branch = 'workflow'
   
-  def __init__(self, username, password):
+  def __init__(self, username, password, production_mode=True):
+    '''
+    The `production_mode` parameter, when True, allows Github upadates.
+    '''
+    self.production_mode = production_mode
     self.user = username
     self.password = password
     self.actualize()
@@ -296,23 +301,25 @@ class annotation_functions(common_functions):
 
   def update_github(self, message):
     '''
-    Push repo to GitHub.
+    Push repo to GitHub if `self.production_mode` is True.
     '''
-    repo_data = 'https://%s:%s@%s' %(self.user,
-                                     self.password,
-                                     self.GIT_ANNOTATED.split('//')[1])
-    # Use ['git', 'checkout', '-b', self.branch] to create branch
-    sp.run(['git', 'checkout', self.branch], cwd=self.ANNOTATED_PATH)
-    sp.run(['git', 'add', '.'], cwd=self.ANNOTATED_PATH)
-    sp.run(['git', 'commit', '-a','-m', message], cwd=self.ANNOTATED_PATH)
-    sp.run(['git', 'push', repo_data, self.branch],
-           cwd=self.ANNOTATED_PATH)
+    if self.production_mode:
+      repo_data = 'https://%s:%s@%s' %(self.user,
+                                       self.password,
+                                       self.GIT_ANNOTATED.split('//')[1])
+      # Use ['git', 'checkout', '-b', self.branch] to create branch
+      sp.run(['git', 'checkout', self.branch], cwd=self.ANNOTATED_PATH)
+      sp.run(['git', 'add', '.'], cwd=self.ANNOTATED_PATH)
+      sp.run(['git', 'commit', '-a','-m', message], cwd=self.ANNOTATED_PATH)
+      sp.run(['git', 'push', repo_data, self.branch],
+             cwd=self.ANNOTATED_PATH)
     
 #---/ Dashboard scripts /------------------------------------------------------
 #
 class Dashboard(common_functions):
 
-  def __init__(self):
+  def __init__(self, production_mode=True):
+    self.production_mode = production_mode
     self.primary = True
 
   def login_view(self):
@@ -362,7 +369,8 @@ class Dashboard(common_functions):
   
   def plug_annotation_backend(self):
     self.af = annotation_functions(self.login_data["username"],
-                                   self.login_data["password"])
+                                   self.login_data["password"],
+                                   production_mode=self.production_mode)
 
   def select_new_text(self):
     self.af.update_mpat_dict()
@@ -426,7 +434,9 @@ class Dashboard(common_functions):
 #---/ Eel functions /----------------------------------------------------------
 #
 eel.init('static')
-d = Dashboard()
+# Use `production_mode=False` while testing:
+# This skips Github updates
+d = Dashboard(production_mode=True)  
 
 @eel.expose
 def github_login(json_data):
@@ -448,9 +458,9 @@ def check_for_errors():
   print('checking for errors')
   errors = d.check_for_errors()
   if errors==None:
-    eel.errors_feedback("clean")
+    return "clean"
   else:
-    eel.errors_feedback(errors)
+    return errors
 
 @eel.expose
 def open_dir():
@@ -465,6 +475,8 @@ def open_page():
 #---/ Main /-------------------------------------------------------------------
 #
 if __name__ == "__main__":
+  if platform.system()=='Windows' and "HOME" not in os.environ.keys():
+    os.environ["HOME"] = os.environ["USERPROFILE"]
   d.login_view()
 
 
