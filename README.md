@@ -28,6 +28,12 @@ MPAT, its dictionary, and annotated data are updated on start and before each op
 
 ## Warnings and notes:
 - Logs for each session are stored in `annotation_assistant/scr/console.log`.
+- commit 3c56b97: The files are now checked and corrected within the script each time `to_dict ` is updated and when a new annotated text is uploaded. (This happens before running MPAT with `-f` and in fact does the same, but better). Performs the following:   
+    * CSV > TSV.
+    * ENSI > UTF-8.
+    * Add underscores ('_') to empty columns.
+    * Remove extra annotation suggestions.
+    * Clear last three columns (`HEAD`, `DEPREL`, `MISC`).
 
 ## Operations, short summary:
 
