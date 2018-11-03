@@ -505,7 +505,7 @@ class Dashboard(common_functions):
 eel.init('static')
 # Use `production_mode=False` while testing:
 # This skips Github updates
-d = Dashboard(production_mode=False)  
+d = Dashboard(production_mode=True)  
 
 @eel.expose
 def github_login(json_data):
