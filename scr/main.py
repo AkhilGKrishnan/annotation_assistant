@@ -125,6 +125,7 @@ class annotation_functions(common_functions):
   def actualize(self):
     '''
     Actualize MPAT and annotated data.
+    Correct format of downloaded files, if needed.
     '''
     self.install_or_upgrade_mpat()
     if not os.path.exists(self.ANNOTATED_ROOT):
@@ -134,6 +135,8 @@ class annotation_functions(common_functions):
       self.clone_annotated()
     else:
       self.update_annotated()
+    IDs_lst = [f.split('.')[0] for f in os.listdir(self.TO_DICT)]
+    self.correct_format(IDs_lst, dir_path=self.TO_DICT)
     self.load_progress_data()
 
   def install_or_upgrade_mpat(self):
@@ -279,7 +282,7 @@ class annotation_functions(common_functions):
     '''
     self.actualize()
     ID = self.progress_dict[self.user]['annotating']
-    self.correct_format(ID)
+    self.correct_format([ID])
     target = os.path.join(self.PROCESSED, '%s.conll' %ID)
     dest = os.path.join(self.TO_DICT, '%s.conll' %ID)
     shutil.move(target, dest)
@@ -287,17 +290,83 @@ class annotation_functions(common_functions):
     git_message = 'Add annotated %s.conll by %s' %(ID, self.user)
     self.update_github(git_message)
 
-  def correct_format(self, ID):
+  def correct_format(self, IDs_lst, dir_path=''):
     '''
-    Run mpat with -f switch to correct the file format:
-    remove extra columns and add underscores in empty cells.
-    Then replace the original with it.
+    For each file from a list of IDs in dir_path (default is self.PROCESSED):
+    1. run `self.csv2tsv()`: convert CSV to TSV. 
+    2. Run mpat with -f switch to correct the file format:
+      2a. remove extra columns and
+      2b. add underscores in empty cells.
+      2c. Then replace the original with it.
+    3. Print report on csv2tsv cases.
     '''
-    file_path = os.path.join(self.PROCESSED, '%s.conll' %ID)
-    output_path = os.path.join(self.PROCESSED, 'output', '%s.conll' %ID)
-    sp.run(['mpat', '-f', '-i', file_path])
+    if not dir_path:
+      dir_path = self.PROCESSED
+    invalid_uft8_count = 0
+    csv2tsv_count = 0
+    for ID in IDs_lst:
+      file_path = os.path.join(dir_path, '%s.conll' %ID)
+      if self.correct_unicode(file_path):
+        print('Corrected invalid unicode: %s' %ID)
+        invalid_uft8_count+=1
+      if self.csv2tsv(file_path):
+        print('Corrected CSV: %s' %ID)
+        csv2tsv_count+=1
+      output_path = os.path.join(dir_path, 'output', '%s.conll' %ID)
+    print('Correcting format.\n\tInvalid UTF-8: %s file(s)\n\t'
+          'CSV > TSV: %s file(s).'
+          %(invalid_uft8_count, csv2tsv_count))
+    sp.run(['mpat', '-f', '-i', dir_path])
     shutil.move(output_path, file_path)
-    shutil.rmtree(os.path.join(self.PROCESSED, 'output'))
+    shutil.rmtree(os.path.join(dir_path, 'output'))
+
+  def correct_unicode(self, path):
+    '''
+    Check if valid Unicode, convert from ANSI, if needed.
+    Subfunction of ´self.correct_format()´.
+    '''
+    with codecs.open(path, 'r', 'utf-8') as f:
+      try:
+        conll_lines = f.readlines()
+        return False
+      except UnicodeDecodeError:
+        pass
+    with codecs.open(path, 'r', 'ansi') as f:
+      f_str = str(f.read())
+    self.dump(f_str, path)      
+    return True
+      
+  def csv2tsv(self, path):
+    '''
+    WARNING: This function clears the content of the last 3 columns.
+    Convert CST to TSV.
+    Also:
+      - Remove extra tabs rests.
+      - Insert '_' to empty fields.
+    Subfunction of ´self.correct_format()´.
+    '''
+    with codecs.open(path, 'r', 'utf-8') as f:
+      conll_lines = list(f.readlines())
+      if ',' not in ''.join(conll_lines):
+        return False
+      conll_lines = [l.strip('\r\n') for l in conll_lines]
+      if conll_lines==[]:
+        return False
+    tsv_str = ''
+    for csv_row in conll_lines:
+      if '#' in csv_row:
+        csv_row = csv_row.strip(',')
+      else:
+        columns = []
+        for cell in [c.strip('\t_') for c in csv_row.split(',')[:4]]:
+          if cell=='':
+            cell = '_'
+          columns.append(cell)
+        csv_row = ','.join(columns+['_' for i in range(0,3)])
+      tsv_row = csv_row.replace(',', '\t') #'\t'.join(csv_row.split(','))
+      tsv_str+=tsv_row+'\n'
+    self.dump(tsv_str[:-1], path)
+    return True
 
   def update_github(self, message):
     '''
@@ -436,7 +505,7 @@ class Dashboard(common_functions):
 eel.init('static')
 # Use `production_mode=False` while testing:
 # This skips Github updates
-d = Dashboard(production_mode=True)  
+d = Dashboard(production_mode=False)  
 
 @eel.expose
 def github_login(json_data):
