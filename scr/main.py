@@ -17,17 +17,24 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 #---/ Common functions /-------------------------------------------------------
 #
 class common_functions:
-
+  '''
+  '''
   def load_json(self, path):
+    '''
+    '''
     with codecs.open(path, 'r', 'utf-8') as f:
       json_data = json.load(f)
     return json_data
   
   def dump(self, data, filename):
+    '''
+    '''
     with codecs.open(filename, 'w', 'utf-8') as dump:
       dump.write(data)
 
   def get_html(self, url="", path="", repeated=False):
+    '''
+    '''
     html = None
     if url:
       try:
@@ -48,14 +55,20 @@ class common_functions:
 #---/ Subprocesses /-----------------------------------------------------------
 #
 class subprocesses(common_functions):
+  '''
+  '''
 
   def __init__(self):
+    '''
+    '''
     self.subprocesses_list = []
     self.pending_lst = []
     self.max = 4
     self.output = ''
 
   def hide_console(self):
+    '''
+    '''
     startupinfo = None
     if os.name == 'nt':
       startupinfo = subprocess.STARTUPINFO()
@@ -63,6 +76,8 @@ class subprocesses(common_functions):
     return startupinfo
     
   def run(self, cmd, cwd=''):
+    '''
+    '''
     if not cwd:
       cwd = os.getcwd()
     self.output+='%s>%s\n' %(cwd, ' '.join(cmd))
@@ -78,6 +93,8 @@ class subprocesses(common_functions):
     return trace
       
   def trace_console(self, p):
+    '''
+    '''
     output = ""
     try:
       for line in iter(p.stdout.readline, b''):
@@ -87,6 +104,8 @@ class subprocesses(common_functions):
     return self.escape_password(output)
 
   def escape_password(self, output):
+    '''
+    '''
     if 'git push' not in output:
       return output
     return output.replace(output[output.rfind(":")+1:output.find("@")],
@@ -111,12 +130,13 @@ class annotation_functions(common_functions):
   TO_DICT = os.path.join(ANNOTATED_PATH, 'morph', 'to_dict')
   PROCESSED = os.path.join(ANNOTATED_PATH, 'morph', 'processed')
   progress_json_path = os.path.join(ANNOTATED_PATH, 'morph', 'progress.json')
-  branch = 'workflow'
   
-  def __init__(self, username, password, production_mode=True):
+  def __init__(self, username, password, production_mode=True,
+               branch='workflow'):
     '''
     The `production_mode` parameter, when True, allows Github upadates.
     '''
+    self.branch = branch
     self.production_mode = production_mode
     self.user = username
     self.password = password
@@ -139,6 +159,8 @@ class annotation_functions(common_functions):
     self.correct_format(IDs_lst, dir_path=self.TO_DICT)
     self.load_progress_data()
 
+  #---/ MPAT functions /-------------------------------------------------------
+  #
   def install_or_upgrade_mpat(self):
     '''
     Install MPAT if missing or upgrade it.
@@ -165,21 +187,21 @@ class annotation_functions(common_functions):
     '''
     sp.run(['git', 'pull', 'origin', self.branch], cwd=self.ANNOTATED_PATH)
 
-  def load_progress_data(self):
+  #---/ Progress data /--------------------------------------------------------
+  #
+  def load_progress_data(self, path=''):
     '''
     Load `self.progress_dict` from JSON, when exists,
     or create it as blank dict. Dict. format:
     {'username': {annotating: P00003, done: [P00001, P00002]}
     '''
+    if not path:
+      path = self.progress_json_path
     if hasattr(self, 'progress_dict'):
-      if os.path.exists(self.progress_json_path):
-        pd = self.load_json(self.progress_json_path)
-        if pd!=self.progress_dict:
-          for k in pd.keys():
-            if k!=self.user:
-              self.progress_dict[k] = pd[k]
-    elif os.path.exists(self.progress_json_path):
-      self.progress_dict = self.load_json(self.progress_json_path)
+      if os.path.exists(path):
+        self.import_and_merge_progress_data(path)
+    elif os.path.exists(path):
+      self.progress_dict = self.load_json(path)
     else:
       self.progress_dict = {}
     self.progress_lst = []
@@ -187,6 +209,17 @@ class annotation_functions(common_functions):
       if self.progress_dict[k]['annotating']!='':
         self.progress_lst.append(self.progress_dict[k]['annotating'])
       self.progress_lst+=self.progress_dict[k]['done']
+
+  def import_and_merge_progress_data(self, path):
+    '''
+    Import and merge progress data from an outer source.
+    E.g. when the remote progress file was updated.
+    '''
+    pd = self.load_json(path)
+    if pd!=self.progress_dict:
+      for k in pd.keys():
+        if k!=self.user:
+          self.progress_dict[k] = pd[k]
 
   def progress_data_annotating_update(self, ID):
     '''
@@ -197,7 +230,7 @@ class annotation_functions(common_functions):
     if self.user not in self.progress_dict.keys():
      self.progress_dict[self.user] = {'annotating': '', 'done': []}
     self.progress_dict[self.user]['annotating'] = ID
-    self.update_progress_data()
+    self.update_progress_data(remote=True)
 
   def progress_data_ready_update(self):
     '''
@@ -207,14 +240,20 @@ class annotation_functions(common_functions):
     ID = self.progress_dict[self.user]['annotating']
     self.progress_dict[self.user]['done'].append(ID)
     self.progress_dict[self.user]['annotating'] = ''
-    self.update_progress_data()
+    self.update_progress_data(remote=True)
 
-  def update_progress_data(self):
+  def update_progress_data(self, remote=False):
     '''
-    Dump `self.progress_lst` to JSON.
+    Dump `self.progress_lst` to JSON.  
     '''
+    if remote:
+      # ToDo: update progress.json here!
+      self.fetch_file('morph/progress.json')
+      self.load_progress_data()
     self.dump(json.dumps(self.progress_dict), self.progress_json_path)
 
+  #---/ Select and preannotate new text /--------------------------------------
+  #
   def select_new_text(self):
     '''
     Select new text workflow:
@@ -264,14 +303,8 @@ class annotation_functions(common_functions):
                 path)
     shutil.rmtree(os.path.join(root_path, 'output'))
 
-  def check_for_errors(self):
-    '''
-    Check annotated text for errors with mpat.
-    '''
-    ID = self.progress_dict[self.user]['annotating']
-    file_path = os.path.join(self.PROCESSED, '%s.conll' %ID)
-    return sp.run(['mpat', '-c', '-i', file_path])
-
+  #----/ Push annotated text to repo /-----------------------------------------
+  #
   def correct_and_push(self):
     '''
     Push text workflow:
@@ -290,7 +323,9 @@ class annotation_functions(common_functions):
     git_message = 'Add annotated %s.conll by %s' %(ID, self.user)
     self.update_github(git_message)
 
-  def correct_format(self, IDs_lst, dir_path=''):
+  #----/ Checks and corrections /----------------------------------------------
+  #
+  def correct_format(self, IDs_lst=[], dir_path=''):
     '''
     For each file from a list of IDs in dir_path (default is self.PROCESSED):
     1. run `self.csv2tsv()`: convert CSV to TSV. 
@@ -302,6 +337,8 @@ class annotation_functions(common_functions):
     '''
     if not dir_path:
       dir_path = self.PROCESSED
+    if not IDs_lst:
+      IDs_lst = [self.progress_dict[self.user]['annotating']]
     invalid_uft8_count = 0
     csv2tsv_count = 0
     for ID in IDs_lst:
@@ -313,9 +350,15 @@ class annotation_functions(common_functions):
         print('Corrected CSV: %s' %ID)
         csv2tsv_count+=1
       output_path = os.path.join(dir_path, 'output', '%s.conll' %ID)
-    print('Correcting format.\n\tInvalid UTF-8: %s file(s)\n\t'
-          'CSV > TSV: %s file(s).'
-          %(invalid_uft8_count, csv2tsv_count))
+    print('Correcting format in %s file(s).'
+          '\n\tInvalid UTF-8: %s file(s)'
+          '\n\tCSV > TSV: %s file(s).'
+          %(len(IDs_lst),
+            invalid_uft8_count,
+            csv2tsv_count))
+    # the following can probably be removed,
+    # as it's functionality is duplicated by the lines above,
+    # but is less reliable:
     sp.run(['mpat', '-f', '-i', dir_path])
     shutil.move(output_path, file_path)
     shutil.rmtree(os.path.join(dir_path, 'output'))
@@ -368,6 +411,16 @@ class annotation_functions(common_functions):
     self.dump(tsv_str[:-1], path)
     return True
 
+  def check_for_errors(self):
+    '''
+    Check annotated text for errors with mpat.
+    '''
+    ID = self.progress_dict[self.user]['annotating']
+    file_path = os.path.join(self.PROCESSED, '%s.conll' %ID)
+    return sp.run(['mpat', '-c', '-i', file_path])
+
+  #---/ Git functions /--------------------------------------------------------
+  #
   def update_github(self, message):
     '''
     Push repo to GitHub if `self.production_mode` is True.
@@ -382,29 +435,50 @@ class annotation_functions(common_functions):
       sp.run(['git', 'commit', '-a','-m', message], cwd=self.ANNOTATED_PATH)
       sp.run(['git', 'push', repo_data, self.branch],
              cwd=self.ANNOTATED_PATH)
-    
+
+  def fetch_file(self, path):
+    '''
+    Fetch a single remote file.
+    '''
+    sp.run(['git', 'fetch'], cwd=self.ANNOTATED_PATH)
+    sp.run(['git', 'checkout', self.branch, '--', path],
+           cwd=self.ANNOTATED_PATH)
+
+#    
 #---/ Dashboard scripts /------------------------------------------------------
 #
 class Dashboard(common_functions):
+  '''
+  '''
 
   def __init__(self, production_mode=True):
+    '''
+    '''
     self.production_mode = production_mode
     self.primary = True
 
   def login_view(self):
+    '''
+    '''
     self.templates_manager("login", {})
 
   def new_text_view(self):
+    '''
+    '''
     self.templates_manager("new_text",
                            {"username": self.login_data['username']})
 
   def annotation_view(self):
+    '''
+    '''
     ID = self.af.progress_dict[self.af.user]['annotating']
     self.templates_manager("annotate",
                            {"username": self.login_data['username'],
                             "textID": ID})
     
   def annotation_status_check(self):
+    '''
+    '''
     if self.af.user not in self.af.progress_dict.keys():
       return 'add new'
     elif self.af.progress_dict[self.af.user]['annotating']=='':
@@ -412,6 +486,8 @@ class Dashboard(common_functions):
     return 'annotate'
 
   def github_login_check(self, username, password):
+    '''
+    '''
     try:
       g = Github(username, password)
       repos_lst = [x.full_name for x in g.get_user().get_repos()]
@@ -421,7 +497,9 @@ class Dashboard(common_functions):
     except GithubException as e:
       return False
 
-  def github_login(self, json_data):
+  def github_login(self, json_data, branch='workflow'):
+    '''
+    '''
     login_data = json.loads(json_data)
     login_check = self.github_login_check(login_data["username"],
                                           login_data["password"])
@@ -429,24 +507,31 @@ class Dashboard(common_functions):
       eel.login_error()
     else:
       self.login_data = login_data
-      self.plug_annotation_backend()
+      self.plug_annotation_backend(branch=branch)
       status = self.annotation_status_check()
       if status=='add new':
         self.new_text_view()
       elif status=='annotate':
         self.annotation_view()
   
-  def plug_annotation_backend(self):
+  def plug_annotation_backend(self, branch='workflow'):
+    '''
+    '''
     self.af = annotation_functions(self.login_data["username"],
                                    self.login_data["password"],
-                                   production_mode=self.production_mode)
+                                   production_mode=self.production_mode,
+                                   branch=branch)
 
   def select_new_text(self):
+    '''
+    '''
     self.af.update_mpat_dict()
     self.af.select_new_text()
     self.annotation_view()
 
   def check_for_errors(self):
+    '''
+    '''
     errs = self.af.check_for_errors()
     errs_html_str = ''
     for err in errs.strip('\n').split('\n\n'):
@@ -458,7 +543,14 @@ class Dashboard(common_functions):
       return None
     return "<ul class='list-group'>%s</ul>" %errs_html_str
 
+  def correct_and_check(self):
+    '''
+    '''
+    self.af.correct_format()
+    
   def correct_and_push(self):
+    '''
+    '''
     self.af.correct_and_push()
     self.new_text_view()
 
@@ -477,6 +569,8 @@ class Dashboard(common_functions):
       eel.reload()
 
   def render_template(self, path, context):
+    '''
+    '''
     path, filename = os.path.split(path)
     return jinja2.Environment(
         loader=jinja2.FileSystemLoader(path or './')
@@ -496,34 +590,57 @@ class Dashboard(common_functions):
       subprocess.Popen(["xdg-open", path])
 
   def open_page(self):
+    '''
+    '''
     ID = self.af.progress_dict[self.af.user]['annotating']
     url = "https://cdli.ucla.edu/search/archival_view.php?ObjectID=%s" %ID
     webbrowser.open(url)
-
+#
+#---/ Variables /--------------------------------------------------------------
+#
+# Use `git_branch` to override the default 'workflow' git repo branch.
+git_branch = 'workflow'
+#
+# Use `production_mode=False` while testing to skip Github updates.
+production_mode = True
+#
 #---/ Eel functions /----------------------------------------------------------
 #
 eel.init('static')
-# Use `production_mode=False` while testing:
-# This skips Github updates
-d = Dashboard(production_mode=True)  
+d = Dashboard(production_mode=production_mode)
 
 @eel.expose
 def github_login(json_data):
+  '''
+  '''
   print('check github login data')
-  d.github_login(json_data)    
+  d.github_login(json_data, branch=git_branch)    
 
 @eel.expose
 def select_new_text():
+  '''
+  '''
   print('selecting new text')
   d.select_new_text()
 
 @eel.expose
+def correct_and_check():
+  '''
+  '''
+  print('correcting and checking')
+  d.correct_and_check()
+  
+@eel.expose
 def correct_and_push():
+  '''
+  '''
   print('converting and pushing')
   d.correct_and_push()
 
 @eel.expose
 def check_for_errors():
+  '''
+  '''
   print('checking for errors')
   errors = d.check_for_errors()
   if errors==None:
@@ -533,17 +650,23 @@ def check_for_errors():
 
 @eel.expose
 def open_dir():
+  '''
+  '''
   print('opening directory')
   d.open_dir()
   
 @eel.expose
 def open_page():
+  '''
+  '''
   print('opening web page')
   d.open_page()
 
 #---/ Main /-------------------------------------------------------------------
 #
 if __name__ == "__main__":
+  '''
+  '''
   if platform.system()=='Windows' and "HOME" not in os.environ.keys():
     os.environ["HOME"] = os.environ["USERPROFILE"]
   d.login_view()

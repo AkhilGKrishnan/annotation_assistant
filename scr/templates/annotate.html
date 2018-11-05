@@ -32,10 +32,14 @@
 		$( "#CDLI_page" ).click(function() {
 			eel.open_page();
 		});
+		$( "#correct_1, correct_2" ).click(function() {
+			eel.correct_and_check();
+			errors_feedback();
+		});
 		$( "#check_1, #check_2" ).click(function() {
 			errors_feedback();
 		});
-		$( "#push_1, #push_2" ).click(function() {
+		$( "#push_1, #push_2, #push_3" ).click(function() {
 			eel.correct_and_push();
 		});
 	});
@@ -50,19 +54,21 @@
 	<h4>you can open it <a href="" id="dir">locally</a> or view its <a href="" id='CDLI_page'>CDLI page</a>.</h4>
 	<br>
 	<div id='errors_check'>
-		<h4>The annotation is ready? Check it for errors.</h4>
+		<h4>The annotation is ready? Automatically correct your file and check it for errors.</h4>
+		<button type="button" class="btn btn-warning" id="correct_1">Correct and check</button>
 		<button type="button" class="btn btn-primary" id="check_1">Check</button>
 	</div>
 	<div id='errors_detected' style="display:none">
 		<h4>Your file contains the following errors:</h4>
 		<div id='errors_list'></div>
 		<h4>Please, correct them and try again</h4>
-		<button type="button" class="btn btn-danger" id="push_1">Upload text anyways</button>
+		<button type="button" class="btn btn-danger" id="push_2">Correct and upload</button>
+		<button type="button" class="btn btn-warning" id="correct_2">Correct and check</button>
 		<button type="button" class="btn btn-primary" id="check_2">Check again</button>
 	</div>
 	<div id="no_errors" style="display:none">
 		<h4>The annotation is free of errors. Click to upload it to the Github repo:</h4>
-		<button type="button" class="btn btn-primary" id="push_1">Upload text</button>
+		<button type="button" class="btn btn-primary" id="push_3">Correct and upload</button>
 	</div>
 </div>
 </body>
