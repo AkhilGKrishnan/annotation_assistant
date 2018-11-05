@@ -230,7 +230,7 @@ class annotation_functions(common_functions):
     if self.user not in self.progress_dict.keys():
      self.progress_dict[self.user] = {'annotating': '', 'done': []}
     self.progress_dict[self.user]['annotating'] = ID
-    self.update_progress_data(remote=True)
+    self.update_progress_data()
 
   def progress_data_ready_update(self):
     '''
@@ -240,16 +240,14 @@ class annotation_functions(common_functions):
     ID = self.progress_dict[self.user]['annotating']
     self.progress_dict[self.user]['done'].append(ID)
     self.progress_dict[self.user]['annotating'] = ''
-    self.update_progress_data(remote=True)
+    self.update_progress_data()
 
-  def update_progress_data(self, remote=False):
+  def update_progress_data(self):
     '''
     Dump `self.progress_lst` to JSON.  
     '''
-    if remote:
-      # ToDo: update progress.json here!
-      self.fetch_file('morph/progress.json')
-      self.load_progress_data()
+    self.fetch_file('morph/progress.json')
+    self.load_progress_data()
     self.dump(json.dumps(self.progress_dict), self.progress_json_path)
 
   #---/ Select and preannotate new text /--------------------------------------
