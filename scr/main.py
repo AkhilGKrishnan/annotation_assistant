@@ -373,8 +373,8 @@ class annotation_functions(common_functions):
         return False
       except UnicodeDecodeError:
         pass
-    with codecs.open(path, 'r', 'ansi') as f:
-      f_str = str(f.read())
+    with codecs.open(path, 'r', 'windows-1252') as f:
+      f_str = str(f.read()).replace('', "'")
     self.dump(f_str, path)      
     return True
       
@@ -405,8 +405,9 @@ class annotation_functions(common_functions):
             cell = '_'
           columns.append(cell)
         csv_row = ','.join(columns+['_' for i in range(0,3)])
-      tsv_row = csv_row.replace(',', '\t') #'\t'.join(csv_row.split(','))
-      tsv_str+=tsv_row+'\n'
+      tsv_row = csv_row.replace(',', '\t')
+      if tsv_row.strip('\t_')!='':
+        tsv_str+=tsv_row+'\n'
     self.dump(tsv_str[:-1], path)
     return True
 
