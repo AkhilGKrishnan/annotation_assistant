@@ -357,9 +357,10 @@ class annotation_functions(common_functions):
     # the following can probably be removed,
     # as it's functionality is duplicated by the lines above,
     # but is less reliable:
-    sp.run(['mpat', '-f', '-i', dir_path])
-    shutil.move(output_path, file_path)
-    shutil.rmtree(os.path.join(dir_path, 'output'))
+##    
+##    sp.run(['mpat', '-f', '-i', dir_path])
+##    shutil.move(output_path, file_path)
+##    shutil.rmtree(os.path.join(dir_path, 'output'))
 
   def correct_unicode(self, path):
     '''
