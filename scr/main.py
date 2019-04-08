@@ -131,7 +131,7 @@ class annotation_functions(common_functions):
   PROCESSED = os.path.join(ANNOTATED_PATH, 'morph', 'processed')
   progress_json_path = os.path.join(ANNOTATED_PATH, 'morph', 'progress.json')
   
-  def __init__(self, username, password, production_mode=True,
+  def __init__(self, username, password, production_mode=False,
                branch='workflow'):
     '''
     The `production_mode` parameter, when True, allows Github upadates.
@@ -602,7 +602,7 @@ class Dashboard(common_functions):
 git_branch = 'workflow'
 #
 # Use `production_mode=False` while testing to skip Github updates.
-production_mode = True
+production_mode = False
 #
 #---/ Eel functions /----------------------------------------------------------
 #
