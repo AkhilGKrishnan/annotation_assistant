@@ -602,7 +602,7 @@ class Dashboard(common_functions):
 git_branch = 'workflow'
 #
 # Use `production_mode=False` while testing to skip Github updates.
-production_mode = False
+production_mode = True
 #
 #---/ Eel functions /----------------------------------------------------------
 #
